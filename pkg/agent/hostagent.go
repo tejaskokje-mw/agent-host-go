@@ -126,8 +126,7 @@ var (
 )
 
 const (
-	yamlFile         = "configyamls/all/otel-config.yaml"
-	yamlFileNoDocker = "configyamls/nodocker/otel-config.yaml"
+	yamlFile = "configyamls/nodocker/otel-config.yaml"
 )
 
 func (d DatabaseType) String() string {
@@ -273,6 +272,42 @@ func (c *HostAgent) updateYAML(configType, yamlPath string) error {
 		}
 	}
 
+	// Adding docker_stats settings in the config, if docker endpoint is valid
+	dockerSocketPath := strings.Split(c.DockerEndpoint, "//")
+
+	if len(dockerSocketPath) == 2 && isSocketFn(dockerSocketPath[1]) {
+
+		if rec, o := apiYAMLConfig["receivers"].(map[string]interface{}); o {
+			rec["docker_stats"] = map[string]interface{}{
+				"collection_interval": "5s",
+				"endpoint":            c.DockerEndpoint,
+				"timeout":             "20s",
+				"api_version":         "1.24",
+			}
+			apiYAMLConfig["receivers"] = rec
+
+		} else {
+			c.logger.Error("failed to parse receivers config")
+		}
+
+		if service, o := apiYAMLConfig["service"].(map[string]interface{}); o {
+			if pipelines, o := service["pipelines"].(map[string]interface{}); o {
+				pipelines["metrics/docker_stats"] = map[string]interface{}{
+					"exporters":  []string{"otlp/2"},
+					"processors": []string{"resourcedetection", "resource", "batch"},
+					"receivers":  []string{"docker_stats"},
+				}
+				service["pipelines"] = pipelines
+			} else {
+				c.logger.Error("failed to parse pipelines config")
+			}
+			apiYAMLConfig["service"] = service
+		} else {
+			c.logger.Error("failed to parse services config")
+		}
+
+	}
+
 	apiYAMLBytes, err := yaml.Marshal(apiYAMLConfig)
 	if err != nil {
 		c.logger.Error("failed to marshal api data", zap.Error(err))
@@ -289,13 +324,8 @@ func (c *HostAgent) updateYAML(configType, yamlPath string) error {
 
 // GetUpdatedYAMLPath gets the correct otel configuration file
 func (c *HostAgent) GetUpdatedYAMLPath() (string, error) {
-	configType := "docker"
+	configType := "nodocker"
 	yamlPath := yamlFile
-	dockerSocketPath := strings.Split(c.DockerEndpoint, "//")
-	if len(dockerSocketPath) != 2 || !isSocketFn(dockerSocketPath[1]) {
-		configType = "nodocker"
-		yamlPath = yamlFileNoDocker
-	}
 
 	absYamlPath := filepath.Join(c.otelConfigDirectory, yamlPath)
 	if err := c.updateYAML(configType, absYamlPath); err != nil {
