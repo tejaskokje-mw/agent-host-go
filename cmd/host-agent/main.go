@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"io/fs"
 	"net/url"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"checkagent"
 
@@ -28,6 +30,16 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
+
+var isSocketFn = isSocket
+
+func isSocket(path string) bool {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	return fileInfo.Mode().Type() == fs.ModeSocket
+}
 
 var agentVersion = "0.0.1"
 
@@ -261,13 +273,19 @@ func main() {
 						return agent.ErrInvalidHostTags
 					}
 
-					yamlPath, err := hostAgent.GetUpdatedYAMLPath()
-					if err != nil {
-						logger.Error("error getting config file path", zap.Error(err))
-						return err
+					// yamlPath, err := hostAgent.GetUpdatedYAMLPath()
+					// if err != nil {
+					// 	logger.Error("error getting config file path", zap.Error(err))
+					// 	return err
+					// }
+
+					configType := "all"
+					dockerSocketPath := strings.Split(cfg.DockerEndpoint, "//")
+					if len(dockerSocketPath) != 2 || !isSocketFn(dockerSocketPath[1]) {
+						configType = "nodocker"
 					}
 
-					// yamlPath := filepath.Join(installDir, "./configyamls/nodocker/otel-config.yaml")
+					yamlPath := filepath.Join("/etc", "mw-agent", "configyamls", configType, "otel-config.yaml")
 					logger.Info("yaml path loaded", zap.String("path", yamlPath))
 
 					configProvider, err := otelcol.NewConfigProvider(otelcol.ConfigProviderSettings{
