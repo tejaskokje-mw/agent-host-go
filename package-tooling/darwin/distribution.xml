@@ -6,7 +6,7 @@
     <conclusion mime-type="text/html" file="conclusion.html"/>
     <background mime-type="image/png" alignment="bottomleft" scaling="proportional" file="logo.png"/>
     <background-darkAqua mime-type="image/png" alignment="bottomleft" scaling="proportional" file="logo.png"/>
-    <options rootVolumeOnly="true" hostArchitectures="arm64"/>
+    <options rootVolumeOnly="true" hostArchitectures="x86_64,arm64"/>
     <choices-outline>
         <line choice="default"/>
     </choices-outline>
