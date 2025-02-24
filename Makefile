@@ -14,6 +14,8 @@ build-linux-arm64:
 	GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -ldflags=${LD_FLAGS} -o build/mw-host-agent-arm64 cmd/host-agent/main.go
 build-kube:
 	GOOS=linux CGO_ENABLED=0 go build -ldflags=${LD_FLAGS} -o build/mw-kube-agent cmd/kube-agent/main.go
+build-kube-config-updater:
+	GOOS=linux CGO_ENABLED=0 go build -ldflags=${LD_FLAGS} -o build/mw-config-updater cmd/kube-config-updater/main.go
 build: build-linux build-windows build-kube
 
 package-windows: build-windows
@@ -28,7 +30,10 @@ package-linux-rpm: build-linux-amd64 build-linux-arm64
 package-linux: package-linux-deb package-linux-rpm package-linux-docker
 
 package-linux-docker:
-	Dockerfiles/docker-build.sh build local Dockerfiles/DockerfileLinux
+	docker build .  --target build --build-arg GITHUB_TOKEN=$(GH_TOKEN) -t ghcr.io/middleware-labs/mw-agent:local -f Dockerfiles/DockerfileLinux
+
+package-kube-config-updater:
+	docker build .  --target build --build-arg GITHUB_TOKEN=$(GH_TOKEN)  -t ghcr.io/middleware-labs/mw-config-updater:local -f Dockerfiles/DockerfileKubeConfigUpdater
 
 package-darwin: build-darwin-arm64
 	package-tooling/darwin/create_installer.sh ${RELEASE_VERSION}
