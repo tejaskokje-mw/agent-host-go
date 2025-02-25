@@ -1,0 +1,154 @@
+metrics:
+  http.client.duration_bucket:
+    enabled: true
+    description: Histogram bucket for client request duration.
+    unit: ms
+    histogram:
+      aggregation_temporality: cumulative
+
+  http.client.duration_count:
+    enabled: true
+    description: Count of client request durations.
+    unit: "{request}"
+    sum:
+      value_type: int
+      aggregation_temporality: cumulative
+      monotonic: true
+
+  http.client.duration_max:
+    enabled: true
+    description: Maximum duration of client requests.
+    unit: ms
+    gauge: {}
+
+  http.client.duration_min:
+    enabled: true
+    description: Minimum duration of client requests.
+    unit: ms
+    gauge: {}
+
+  http.client.duration_sum:
+    enabled: true
+    description: Total duration of client requests.
+    unit: ms
+    sum:
+      value_type: int
+      aggregation_temporality: cumulative
+      monotonic: true
+
+  http.server.active_requests:
+    enabled: true
+    description: Number of active server requests.
+    unit: "{request}"
+    gauge: {}
+
+  http.server.duration_bucket:
+    enabled: true
+    description: Histogram bucket for server request duration.
+    unit: ms
+    histogram:
+      aggregation_temporality: cumulative
+
+  http.server.duration_count:
+    enabled: true
+    description: Count of server request durations.
+    unit: "{request}"
+    sum:
+      value_type: int
+      aggregation_temporality: cumulative
+      monotonic: true
+
+  http.server.duration_max:
+    enabled: true
+    description: Maximum duration of server requests.
+    unit: ms
+    gauge: {}
+
+  http.server.duration_min:
+    enabled: true
+    description: Minimum duration of server requests.
+    unit: ms
+    gauge: {}
+
+  http.server.duration_sum:
+    enabled: true
+    description: Total duration of server requests.
+    unit: ms
+    sum:
+      value_type: int
+      aggregation_temporality: cumulative
+      monotonic: true
+
+  http.server.request.size_bucket:
+    enabled: true
+    description: Histogram bucket for request sizes.
+    unit: By
+    histogram:
+      aggregation_temporality: cumulative
+
+  http.server.request.size_count:
+    enabled: true
+    description: Count of request size measurements.
+    unit: "{request}"
+    sum:
+      value_type: int
+      aggregation_temporality: cumulative
+      monotonic: true
+
+  http.server.request.size_max:
+    enabled: true
+    description: Maximum request size in bytes.
+    unit: By
+    gauge: {}
+
+  http.server.request.size_min:
+    enabled: true
+    description: Minimum request size in bytes.
+    unit: By
+    gauge: {}
+
+  http.server.request.size_sum:
+    enabled: true
+    description: Total request size in bytes.
+    unit: By
+    sum:
+      value_type: int
+      aggregation_temporality: cumulative
+      monotonic: true
+
+  http.server.response.size_bucket:
+    enabled: true
+    description: Histogram bucket for response sizes.
+    unit: By
+    histogram:
+      aggregation_temporality: cumulative
+
+  http.server.response.size_count:
+    enabled: true
+    description: Count of response size measurements.
+    unit: "{response}"
+    sum:
+      value_type: int
+      aggregation_temporality: cumulative
+      monotonic: true
+
+  http.server.response.size_max:
+    enabled: true
+    description: Maximum response size in bytes.
+    unit: By
+    gauge: {}
+
+  http.server.response.size_min:
+    enabled: true
+    description: Minimum response size in bytes.
+    unit: By
+    gauge: {}
+
+  http.server.response.size_sum:
+    enabled: true
+    description: Total response size in bytes.
+    unit: By
+    sum:
+      value_type: int
+      aggregation_temporality: cumulative
+      monotonic: true
